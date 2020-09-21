@@ -62,7 +62,7 @@
     var histories = [];
     var mapping = {}
     $(document).ready(function(){
-        $.get('https://raw.githubusercontent.com/wenhuchen/HybridQA/master/released_data/dev.json', function(data){
+        $.get('https://raw.githubusercontent.com/wenhuchen/HybridQA/master/released_data/dev.traced.json', function(data){
             collected = JSON.parse(data);
         }, 'text').fail(function() {
             console.log("requesting text failed");
@@ -77,7 +77,7 @@
     
     function JsonToTable(tableidx, data){
         table_cells = []
-        var title = format("<a target='_blank' id='{0}' href='{1}'> {2} </a>", data['title'], data['url'], data['title'])
+        var title = format('<a target="_blank" id="{0}" href="{1}"> {2} </a>', data['title'], data['url'], data['title'])
         //var page = data['title'].split(' ').join('_');
         //var text = httpGet(format('/wiki/{0}', page));
         $('#title').html('Index: ' + tableidx + ' Title: ' + title)
@@ -85,16 +85,11 @@
         var output = []
         var tmp = '<tr>';
         for (i = 0; i < data['header'].length; i++){
-            tmp += '<th>';
-            for(j = 0; j < data['header'][i][0].length; j++){
-                if (data['header'][i][1][j] == null){
-                    tmp += data['header'][i][0][j];
-                }
-                else{
-                    tmp += format('<a onmouseover="showMessage2(this)" id="{0}" href="{1}"> {2}</a>', data['header'][i][1][j], '#extra2', data['header'][i][0][j]);
-                }
+            tmp += '<th>' + data['header'][i][0] + ' '
+            for(j = 0; j < data['header'][i][1].length; j++){
+                tmp += format('<a onmouseover="showMessage2(this)" id="{0}" href="{1}">[{2}]</a>', data['header'][i][1][j], '#extra2', j + 1);
                 if (j < data['header'][i][1].length - 1) {
-                    tmp += ', ';
+                    tmp += ',';
                 }
             }
             tmp += "</th>";
@@ -106,19 +101,14 @@
         for (i = 0; i < data['data'].length; i++){
             tmp = '<tr>'
             for (j = 0; j < data['data'][i].length; j++){
-                tmp += '<td>';
-                for (k = 0; k < data['data'][i][j][0].length; k++){
-                    if (data['data'][i][j][1][k] == null){
-                        tmp += data['data'][i][j][0][k];
+                tmp += '<td>' + data['data'][i][j][0] + ' ';
+                table_cells.push(data['data'][i][j][0])
+                for (k = 0; k < data['data'][i][j][1].length; k++){
+                    tmp += format('<a onmouseover="showMessage2(this)" id="{0}" href="{1}">[{2}]</a>', data['data'][i][j][1][k], '#extra2', k + 1);
+                    if (k < data['data'][i][j][1].length - 1) {
+                        tmp += ',';
                     }
-                    else{
-                        tmp += format("<a onmouseover='showMessage2(this)' id='{0}' href='{1}'> {2}</a>", data['data'][i][j][1][k], '#extra2', data['data'][i][j][0][k]);
-                    }
-                    if (k < data['data'][i][j][0].length - 1) {
-                        tmp += ', ';
-                    }
-                    table_cells.push(data['data'][i][j][0][k])
-                    mapping[decodeURIComponent(data['data'][i][j][1][k])] = data['data'][i][j][0][k]
+                    mapping[data['data'][i][j][1][k]] = data['data'][i][j][0]
                 }
                 tmp += '</td>';
             }
@@ -205,7 +195,7 @@
     
     function showMessage2(hyperlink){
         var theUrl = hyperlink.id;
-        var text = global_requests[decodeURIComponent(theUrl)];
+        var text = global_requests[theUrl];
         var title = hyperlink.text.trim();
         
         $('#extra2').html(format("<b>{0}</b>: {1}", title, text));
@@ -252,8 +242,8 @@
     function show(collected) {
         var tableidx = collected['table_id'];
         var table_content = '';
-        var table_url = 'https://raw.githubusercontent.com/wenhuchen/WikiTables-WithLinks/master/tables/' + tableidx + '.json';
-        var request_cur = 'https://raw.githubusercontent.com/wenhuchen/WikiTables-WithLinks/master/request/' + tableidx + '.json';
+        var table_url = 'https://raw.githubusercontent.com/wenhuchen/WikiTables-WithLinks/master/tables_tok/' + tableidx + '.json';
+        var request_cur = 'https://raw.githubusercontent.com/wenhuchen/WikiTables-WithLinks/master/request_tok/' + tableidx + '.json';
         $.get(table_url, function(data){
             var obj = JSON.parse(data)
             var new_data = JsonToTable(tableidx, obj);
@@ -278,32 +268,7 @@
         }
         tmp = tmp.join(' ||| ');
         
-        $('#where').html("From: " + collected['where'] + " -> " + tmp)
-        
-        /*
-        $('#type').html('Type: ' + collected['type'])
-        
-        var tmp = []
-        for (var value of collected['tf-idf']) {
-            tmp.push(value[0])
-        }
-        tmp = tmp.join(' ||| ');
-        $('#tfidf').html("TF-IDF: " + tmp);
-        
-        var tmp = []
-        for (var value of collected['string-overlap']) {
-            tmp.push(value[0]);
-        }
-        tmp = tmp.join(' ||| ');
-        $('#string').html("STRING-OVERLAP: " + tmp);        
-        
-        var tmp = [];
-        for (var value of collected['link']) {
-            tmp.push(value[0]);
-        }
-        tmp = tmp.join(' ||| ');
-        $('#linking').html("Linked Cell: " + tmp);
-        */
+        $('#where').html("From: "  + tmp)
     }
 </script>
 
