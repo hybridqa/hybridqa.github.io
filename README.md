@@ -1,2 +1,2 @@
-# tabfact.github.io
-The official page for TabFact dataset from UCSB NLP group.
+# hybridqa.github.io
+The official page for HybridQA dataset from UCSB NLP group.
